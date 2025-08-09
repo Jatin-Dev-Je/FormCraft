@@ -28,8 +28,7 @@ export const computeDerivedValue = (
 };
 
 const evaluateFormula = (formula: string, parentValues: Record<string, any>, formData: FormInput): any => {
-  // Simple formula evaluation - this is a basic implementation
-  // In production, you might want to use a more robust expression evaluator
+  // Basic formula evaluation
   
   // Example formulas:
   // "age_from_dob" - calculate age from date of birth
@@ -70,7 +69,7 @@ const evaluateFormula = (formula: string, parentValues: Record<string, any>, for
       return (total / values.length).toFixed(2);
 
     default:
-      // Try to evaluate as a simple mathematical expression
+      // Evaluate math expression
       try {
         // Replace field references with actual values
         let expression = formula;
@@ -78,7 +77,7 @@ const evaluateFormula = (formula: string, parentValues: Record<string, any>, for
           expression = expression.replace(new RegExp(`\\b${key}\\b`, 'g'), String(value || 0));
         });
         
-        // Basic safety check - only allow numbers, operators, and parentheses
+        // Safety check for valid characters
         if (/^[0-9+\-*/().\s]+$/.test(expression)) {
           return eval(expression);
         }

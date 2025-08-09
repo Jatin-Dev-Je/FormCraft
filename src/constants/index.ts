@@ -1,4 +1,4 @@
-// Constants for field types, validation rules, and other reusable values
+// App constants
 import { FieldType, ValidationType } from '../types/form';
 
 export const FIELD_TYPES = FieldType;

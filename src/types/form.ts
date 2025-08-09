@@ -1,4 +1,4 @@
-// TypeScript types & interfaces for the form builder
+// Form types and interfaces
 
 export enum FieldType {
   TEXT = 'text',
@@ -61,7 +61,7 @@ export interface SavedForm {
 }
 
 export interface FormInput {
-  [fieldId: string]: any;
+  [fieldId: string]: string | number | boolean | string[] | null;
 }
 
 export interface ValidationError {

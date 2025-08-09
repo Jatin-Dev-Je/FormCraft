@@ -53,20 +53,27 @@ const CreateForm: React.FC = () => {
   const [saveError, setSaveError] = useState('');
 
   React.useEffect(() => {
-    if (!currentForm) {
-      dispatch(createNewForm());
-    }
-  }, [dispatch, currentForm]);
+    // Create new form on component mount
+    dispatch(createNewForm());
+    setEditingField(null);
+    setUnsavedChanges(false);
+  }, [dispatch]);
+
+  const [unsavedChanges, setUnsavedChanges] = useState(false);
+  const [showDiscardDialog, setShowDiscardDialog] = useState(false);
 
   const handleAddField = () => {
     const newField = createDefaultField();
     dispatch(addField(newField));
     setEditingField(newField);
+    setUnsavedChanges(true);
   };
 
   const handleUpdateField = (field: FormField) => {
     dispatch(updateField({ id: field.id, field }));
-    setEditingField(null);
+    // Keep the field selected for continued editing
+    setEditingField(field);
+    setUnsavedChanges(true);
   };
 
   const handleDeleteField = (fieldId: string) => {
@@ -74,10 +81,21 @@ const CreateForm: React.FC = () => {
     if (editingField?.id === fieldId) {
       setEditingField(null);
     }
+    setUnsavedChanges(true);
   };
 
   const handleReorderFields = (fromIndex: number, toIndex: number) => {
     dispatch(reorderFields({ fromIndex, toIndex }));
+    setUnsavedChanges(true);
+  };
+
+  // Function to handle closing the form builder
+  const handleClose = () => {
+    if (unsavedChanges) {
+      setShowDiscardDialog(true);
+    } else {
+      navigate(ROUTES.MY_FORMS);
+    }
   };
 
   const handleEditField = (field: FormField) => {
@@ -104,6 +122,7 @@ const CreateForm: React.FC = () => {
       };
       
       saveFormToStorage(formToSave);
+      setUnsavedChanges(false);
       dispatch(updateFormName(formName.trim()));
       saveDialog.closeDialog();
       setFormName('');
@@ -117,6 +136,10 @@ const CreateForm: React.FC = () => {
   };
 
   const handlePreview = () => {
+    if (!currentForm || currentForm.fields.length === 0) {
+      alert('Please add at least one field to preview the form.');
+      return;
+    }
     navigate(ROUTES.PREVIEW);
   };
 
@@ -250,7 +273,11 @@ const CreateForm: React.FC = () => {
       {/* Save Form Dialog - Full screen on mobile */}
       <Dialog 
         open={saveDialog.isOpen} 
-        onClose={saveDialog.closeDialog}
+        onClose={(_, reason) => {
+          if (reason !== 'backdropClick') {
+            saveDialog.closeDialog();
+          }
+        }}
         fullScreen={isMobile}
         maxWidth="sm"
         fullWidth
@@ -302,6 +329,38 @@ const CreateForm: React.FC = () => {
       >
         <Add />
       </Fab>
+
+      {/* Discard Changes Dialog */}
+      <Dialog
+        open={showDiscardDialog}
+        onClose={() => setShowDiscardDialog(false)}
+        aria-labelledby="discard-dialog-title"
+      >
+        <DialogTitle id="discard-dialog-title">
+          Discard Unsaved Changes?
+        </DialogTitle>
+        <DialogContent>
+          <Alert severity="warning" sx={{ mt: 1 }}>
+            You have unsaved changes. Are you sure you want to leave? All unsaved changes will be lost.
+          </Alert>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowDiscardDialog(false)}>
+            Continue Editing
+          </Button>
+          <Button
+            onClick={() => {
+              setShowDiscardDialog(false);
+              setUnsavedChanges(false);
+              navigate(ROUTES.MY_FORMS);
+            }}
+            color="error"
+            variant="contained"
+          >
+            Discard Changes
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };

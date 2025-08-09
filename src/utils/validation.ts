@@ -40,7 +40,7 @@ export const validateField = (value: any, rules: ValidationRule[]): ValidationEr
 
       case 'customPassword':
         if (value && typeof value === 'string') {
-          // Custom password rule: minimum 8 characters, must contain a number
+          // Password: min 8 chars with number
           const hasMinLength = value.length >= 8;
           const hasNumber = /\d/.test(value);
           

@@ -30,6 +30,7 @@ const PreviewForm: React.FC = () => {
   useEffect(() => {
     const loadForm = () => {
       setLoading(true);
+      setError(''); // Clear any previous errors
       
       // If we have an ID, load from localStorage
       if (id) {
@@ -47,8 +48,14 @@ const PreviewForm: React.FC = () => {
         }
       } 
       // Otherwise, use current form from Redux
-      else if (currentForm) {
-        setForm(currentForm);
+      else if (currentForm && currentForm.fields.length > 0) {
+        // Use currentForm even if it's not saved yet
+        setForm({
+          ...currentForm,
+          name: currentForm.name || 'Form Preview'
+        });
+      } else if (currentForm && currentForm.fields.length === 0) {
+        setError('No fields in form. Add some fields to preview the form.');
       } else {
         setError('No form to preview');
       }
@@ -64,6 +71,10 @@ const PreviewForm: React.FC = () => {
     if (form) {
       const validationErrors = validateForm(data, form.fields);
       setErrors(validationErrors);
+      // Clear errors for fields that are now valid
+      setErrors(prev => prev.filter(error => 
+        validationErrors.some(newError => newError.fieldId === error.fieldId)
+      ));
     }
   };
 
@@ -72,8 +83,29 @@ const PreviewForm: React.FC = () => {
       const validationErrors = validateForm(formData, form.fields);
       setErrors(validationErrors);
       if (validationErrors.length === 0) {
-        // Form is valid
-        alert('Form submitted successfully!\n\n' + JSON.stringify(formData, null, 2));
+        try {
+          // In a real app, you would submit to an API here
+          // Store submission data
+          const submissionData = {
+            formId: form.id,
+            formName: form.name,
+            submittedAt: new Date().toISOString(),
+            data: formData
+          };
+          // Store submission in localStorage
+          const submissions = JSON.parse(localStorage.getItem('formSubmissions') || '[]');
+          submissions.push(submissionData);
+          localStorage.setItem('formSubmissions', JSON.stringify(submissions));
+          
+          alert('Form submitted successfully!\n\n' + JSON.stringify(submissionData, null, 2));
+        } catch (error) {
+          console.error('Form submission failed:', error);
+          alert('Failed to submit form. Please try again.');
+        }
+      } else {
+        // Scroll to the first error
+        const firstErrorField = document.querySelector(`[name="${validationErrors[0].fieldId}"]`);
+        firstErrorField?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     }
   };
@@ -97,16 +129,19 @@ const PreviewForm: React.FC = () => {
   if (error) {
     return (
       <Container sx={{ py: 4 }}>
-        <Alert severity="error" sx={{ mb: 3 }}>
+        <Alert 
+          severity={error.includes('No fields in form') ? "warning" : "error"} 
+          sx={{ mb: 3 }}
+        >
           {error}
         </Alert>
         <Box display="flex" gap={2}>
           <Button
-            variant="outlined"
+            variant="contained"
             startIcon={<ArrowBack />}
             onClick={handleBackToBuilder}
           >
-            Back to Builder
+            Back to Form Builder
           </Button>
           <Button
             variant="outlined"
@@ -192,12 +227,12 @@ const PreviewForm: React.FC = () => {
         </Button>
       </Box>
 
-      {/* Form Data and Errors Debug (for development) */}
+      {/* Development info */}
       {process.env.NODE_ENV === 'development' && (
         <>
           <Paper sx={{ mt: 4, p: 2, backgroundColor: '#f5f5f5' }}>
             <Typography variant="h6" gutterBottom>
-              Form Data (Debug)
+              Form Data
             </Typography>
             <pre style={{ fontSize: '12px', overflow: 'auto' }}>
               {JSON.stringify(formData, null, 2)}

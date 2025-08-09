@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import {
   Container,
   Typography,
@@ -21,12 +22,14 @@ import { Add, Visibility, Delete, DateRange } from '@mui/icons-material';
 import { SavedForm } from '../types/form';
 import { getSavedForms, deleteFormFromStorage } from '../utils/localStorage';
 import { formatDate, getFieldTypeCounts } from '../utils/formHelpers';
+import { createNewForm } from '../store/formSlice';
 import { useDialog } from '../hooks';
 import { ROUTES } from '../constants';
 import PageHeader from '../components/PageHeader';
 
 const MyForms: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [forms, setForms] = useState<SavedForm[]>([]);
   const deleteDialog = useDialog();
   const [formToDelete, setFormToDelete] = useState<SavedForm | null>(null);
@@ -52,6 +55,8 @@ const MyForms: React.FC = () => {
   };
 
   const handleCreateNew = () => {
+    // Clear any existing form data and create a new one
+    dispatch(createNewForm());
     navigate(ROUTES.CREATE);
   };
 

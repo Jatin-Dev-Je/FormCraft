@@ -4,7 +4,7 @@ import { STORAGE_KEYS } from '../constants';
 const FORMS_STORAGE_KEY = STORAGE_KEYS.FORMS;
 
 /**
- * Safely parses JSON from localStorage with error handling
+ * Parse JSON from localStorage with error handling
  * @param key - The localStorage key
  * @param defaultValue - Default value if parsing fails
  * @returns Parsed value or default
@@ -20,7 +20,7 @@ const safeJSONParse = <T>(key: string, defaultValue: T): T => {
 };
 
 /**
- * Safely saves JSON to localStorage with error handling
+ * Save JSON to localStorage with error handling
  * @param key - The localStorage key
  * @param value - The value to save
  * @throws Error if save fails
@@ -66,7 +66,7 @@ export const saveFormToStorage = (form: FormState): void => {
 };
 
 /**
- * Retrieves all saved forms from localStorage
+ * Get all saved forms from localStorage
  * @returns Array of saved forms, empty array if none found
  */
 export const getSavedForms = (): SavedForm[] => {
@@ -74,7 +74,7 @@ export const getSavedForms = (): SavedForm[] => {
 };
 
 /**
- * Retrieves a specific form by ID
+ * Get a specific form by ID
  * @param id - The form ID to find
  * @returns The form if found, null otherwise
  */

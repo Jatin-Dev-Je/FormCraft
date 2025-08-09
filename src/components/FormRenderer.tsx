@@ -38,11 +38,22 @@ const FormRenderer: React.FC<FormRendererProps> = ({
     const initData: FormInput = { ...initialData };
     
     fields.forEach(field => {
-      if (!(field.id in initData)) {
-        if (field.type === FieldType.CHECKBOX && field.options) {
-          initData[field.id] = [];
-        } else {
-          initData[field.id] = field.defaultValue || '';
+      if (!(field.id in initData) || initData[field.id] === null) {
+        switch (field.type) {
+          case FieldType.CHECKBOX:
+            initData[field.id] = field.defaultValue || [];
+            break;
+          case FieldType.NUMBER:
+            initData[field.id] = field.defaultValue || 0;
+            break;
+          case FieldType.RADIO:
+            initData[field.id] = field.defaultValue || (field.options && field.options[0]) || '';
+            break;
+          case FieldType.SELECT:
+            initData[field.id] = field.defaultValue || (field.options && field.options[0]) || '';
+            break;
+          default:
+            initData[field.id] = field.defaultValue || '';
         }
       }
     });
