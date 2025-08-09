@@ -21,7 +21,6 @@ import {
   useTheme,
   useMediaQuery,
   SelectChangeEvent,
-  Divider,
   Paper,
   Tooltip,
   Badge,
@@ -33,8 +32,7 @@ import {
   Settings,
   Rule,
   List,
-  Star,
-  Info
+  Star
 } from '@mui/icons-material';
 import { FormField, ValidationRule, FieldType } from '../types/form';
 import { FIELD_TYPE_OPTIONS, VALIDATION_RULE_OPTIONS } from '../constants';

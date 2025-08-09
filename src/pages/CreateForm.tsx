@@ -89,15 +89,6 @@ const CreateForm: React.FC = () => {
     setUnsavedChanges(true);
   };
 
-  // Function to handle closing the form builder
-  const handleClose = () => {
-    if (unsavedChanges) {
-      setShowDiscardDialog(true);
-    } else {
-      navigate(ROUTES.MY_FORMS);
-    }
-  };
-
   const handleEditField = (field: FormField) => {
     setEditingField(field);
   };

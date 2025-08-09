@@ -27,7 +27,7 @@ export const computeDerivedValue = (
   }
 };
 
-const evaluateFormula = (formula: string, parentValues: Record<string, any>, formData: FormInput): any => {
+const evaluateFormula = (formula: string, parentValues: Record<string, any>): any => {
   // Basic formula evaluation
   
   // Example formulas:
