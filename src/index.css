@@ -1,0 +1,70 @@
+/* Global styles and MUI theme customizations */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #fafafa;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Form validation styles */
+.MuiFormHelperText-root.Mui-error {
+  margin-left: 0;
+  margin-top: 4px;
+}
+
+/* Custom card hover effects */
+.MuiCard-root {
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.MuiCard-root:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .MuiContainer-root {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
+/* Print styles */
+@media print {
+  .MuiAppBar-root {
+    display: none !important;
+  }
+  
+  .MuiFab-root {
+    display: none !important;
+  }
+}
