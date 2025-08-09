@@ -47,6 +47,7 @@ const CreateForm: React.FC = () => {
   const { currentForm } = useSelector((state: RootState) => state.form);
   
   const [editingField, setEditingField] = useState<FormField | null>(null);
+  const [showDiscardDialog, setShowDiscardDialog] = useState(false);
   const saveDialog = useDialog();
   const derivedFieldDialog = useDialog();
   const [formName, setFormName] = useState('');
@@ -56,24 +57,18 @@ const CreateForm: React.FC = () => {
     // Create new form on component mount
     dispatch(createNewForm());
     setEditingField(null);
-    setUnsavedChanges(false);
   }, [dispatch]);
-
-  const [unsavedChanges, setUnsavedChanges] = useState(false);
-  const [showDiscardDialog, setShowDiscardDialog] = useState(false);
 
   const handleAddField = () => {
     const newField = createDefaultField();
     dispatch(addField(newField));
     setEditingField(newField);
-    setUnsavedChanges(true);
   };
 
   const handleUpdateField = (field: FormField) => {
     dispatch(updateField({ id: field.id, field }));
     // Keep the field selected for continued editing
     setEditingField(field);
-    setUnsavedChanges(true);
   };
 
   const handleDeleteField = (fieldId: string) => {
@@ -81,12 +76,10 @@ const CreateForm: React.FC = () => {
     if (editingField?.id === fieldId) {
       setEditingField(null);
     }
-    setUnsavedChanges(true);
   };
 
   const handleReorderFields = (fromIndex: number, toIndex: number) => {
     dispatch(reorderFields({ fromIndex, toIndex }));
-    setUnsavedChanges(true);
   };
 
   const handleEditField = (field: FormField) => {
@@ -113,7 +106,6 @@ const CreateForm: React.FC = () => {
       };
       
       saveFormToStorage(formToSave);
-      setUnsavedChanges(false);
       dispatch(updateFormName(formName.trim()));
       saveDialog.closeDialog();
       setFormName('');
@@ -342,7 +334,6 @@ const CreateForm: React.FC = () => {
           <Button
             onClick={() => {
               setShowDiscardDialog(false);
-              setUnsavedChanges(false);
               navigate(ROUTES.MY_FORMS);
             }}
             color="error"

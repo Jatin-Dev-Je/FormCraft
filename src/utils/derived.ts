@@ -20,7 +20,7 @@ export const computeDerivedValue = (
     });
 
     // Basic formula evaluation - can be extended
-    return evaluateFormula(field.derivedFormula, parentValues, formData);
+    return evaluateFormula(field.derivedFormula, parentValues);
   } catch (error) {
     console.error('Error computing derived value:', error);
     return '';
@@ -69,7 +69,7 @@ const evaluateFormula = (formula: string, parentValues: Record<string, any>): an
       return (total / values.length).toFixed(2);
 
     default:
-      // Evaluate math expression
+      // Evaluate math expression safely
       try {
         // Replace field references with actual values
         let expression = formula;
@@ -79,7 +79,7 @@ const evaluateFormula = (formula: string, parentValues: Record<string, any>): an
         
         // Safety check for valid characters
         if (/^[0-9+\-*/().\s]+$/.test(expression)) {
-          return eval(expression);
+          return evaluateBasicMath(expression);
         }
       } catch (error) {
         console.error('Error evaluating formula:', error);
@@ -108,4 +108,66 @@ export const getDerivedFieldOptions = (fields: FormField[]): Array<{ id: string;
   return fields
     .filter(field => !field.isDerived)
     .map(field => ({ id: field.id, label: field.label }));
+};
+
+// Safe math expression evaluator (without eval)
+const evaluateBasicMath = (expression: string): number => {
+  // Remove spaces
+  expression = expression.replace(/\s/g, '');
+  
+  // Simple recursive descent parser for basic arithmetic
+  let index = 0;
+  
+  const parseNumber = (): number => {
+    let num = '';
+    while (index < expression.length && /[0-9.]/.test(expression[index])) {
+      num += expression[index++];
+    }
+    return parseFloat(num) || 0;
+  };
+  
+  const parseFactor = (): number => {
+    if (expression[index] === '(') {
+      index++; // skip '('
+      const result = parseExpression();
+      index++; // skip ')'
+      return result;
+    }
+    return parseNumber();
+  };
+  
+  const parseTerm = (): number => {
+    let result = parseFactor();
+    while (index < expression.length && (expression[index] === '*' || expression[index] === '/')) {
+      const operator = expression[index++];
+      const operand = parseFactor();
+      if (operator === '*') {
+        result *= operand;
+      } else {
+        result = operand !== 0 ? result / operand : 0;
+      }
+    }
+    return result;
+  };
+  
+  const parseExpression = (): number => {
+    let result = parseTerm();
+    while (index < expression.length && (expression[index] === '+' || expression[index] === '-')) {
+      const operator = expression[index++];
+      const operand = parseTerm();
+      if (operator === '+') {
+        result += operand;
+      } else {
+        result -= operand;
+      }
+    }
+    return result;
+  };
+  
+  try {
+    return parseExpression();
+  } catch (error) {
+    console.error('Error parsing math expression:', error);
+    return 0;
+  }
 };
